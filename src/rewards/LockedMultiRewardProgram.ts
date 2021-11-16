@@ -116,6 +116,8 @@ export default class LockedMultiRewardProgram extends RewardProgram {
     )
 
     let totalWithdrawn = 0
+    let unlockedReward = 0
+    let lifeTimeEarned = 0
 
     if (rewardsToken) {
       totalWithdrawn = await ethCall(
@@ -125,9 +127,33 @@ export default class LockedMultiRewardProgram extends RewardProgram {
         this.web3,
         [account, rewardsToken]
       )
+
+      unlockedReward = await ethCall(
+        this.stakingAddress,
+        'unlockedReward',
+        ABI,
+        this.web3,
+        [account, rewardsToken]
+      )     
+      
+       lifeTimeEarned = await ethCall(
+        this.stakingAddress,
+        'earnedLifeTime',
+        ABI,
+        this.web3,
+        [account, rewardsToken]
+      )       
     }
 
-    return [totalStaked, totalWithdrawn]
+    const unlockedStake = await ethCall(
+      this.stakingAddress,
+      'unlockedStake',
+      ABI,
+      this.web3,
+      [account]
+    )
+    
+    return [totalStaked, totalWithdrawn, unlockedStake, unlockedReward, lifeTimeEarned]
   }
 
   /**
